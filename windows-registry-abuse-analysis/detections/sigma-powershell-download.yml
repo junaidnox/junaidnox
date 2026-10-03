@@ -1,0 +1,46 @@
+title: PowerShell Download Followed By Suspicious Execution
+id: 5d79bdf2-7d6d-4b4d-a651-d3b660ff8a9a
+status: experimental
+description: Detects PowerShell commands that download remote content and show signs of immediate execution or temporary file staging.
+author: Muhammad Junaid
+date: 2026/10/04
+tags:
+  - attack.execution
+  - attack.t1059.001
+  - attack.command_and_control
+  - attack.t1105
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection_powershell:
+    Image|endswith:
+      - '\powershell.exe'
+      - '\pwsh.exe'
+  selection_download:
+    CommandLine|contains:
+      - 'Invoke-WebRequest'
+      - 'Invoke-RestMethod'
+      - 'iwr '
+      - 'irm '
+      - 'DownloadString'
+      - 'DownloadFile'
+  selection_execution:
+    CommandLine|contains:
+      - 'Start-Process'
+      - 'iex'
+      - 'Invoke-Expression'
+      - '.cmd'
+      - '.bat'
+      - '.ps1'
+  selection_temp:
+    CommandLine|contains:
+      - '\Temp\'
+      - '$env:TEMP'
+      - '$env:SystemRoot\Temp'
+  condition: selection_powershell and selection_download and (selection_execution or selection_temp)
+falsepositives:
+  - Legitimate enterprise deployment scripts
+  - Software installers
+  - Administrator maintenance scripts
+level: high
