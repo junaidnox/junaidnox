@@ -1,0 +1,13 @@
+# Local analysis output
+*.log
+*.evtx
+*.pcap
+*.pcapng
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Temporary files
+tmp/
+temp/
